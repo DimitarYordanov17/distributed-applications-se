@@ -1,0 +1,104 @@
+﻿@model IEnumerable<PFM.Models.Transaction>
+
+@{
+    var categories = ViewBag.Categories as SelectList;
+    var accounts = ViewBag.Accounts as SelectList;
+    int selectedCategoryId = ViewBag.SelectedCategoryId;
+    int selectedAccountId = ViewBag.SelectedAccountId;
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New Transaction</a>
+</p>
+
+<form method="get" asp-action="Index" class="form-inline mb-3">
+    <select name="sortOrder" class="form-control mr-2">
+        <option value="">-- Sort by Amount --</option>
+        <option value="asc" selected="@(ViewBag.SortOrder == "asc" ? "selected" : null)">Amount Ascending</option>
+        <option value="desc" selected="@(ViewBag.SortOrder == "desc" ? "selected" : null)">Amount Descending</option>
+    </select>
+
+    <select name="categoryId" class="form-control mr-2">
+        @if (selectedCategoryId == 0)
+        {
+            <option value="0" selected>-- All Categories --</option>
+        }
+        else
+        {
+            <option value="0">-- All Categories --</option>
+        }
+
+        @foreach (var item in categories)
+        {
+            if (item.Value == selectedCategoryId.ToString())
+            {
+                <option value="@item.Value" selected>@item.Text</option>
+            }
+            else
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        }
+    </select>
+
+    <select name="accountId" class="form-control mr-2">
+        @if (selectedAccountId == 0)
+        {
+            <option value="0" selected>-- All Accounts --</option>
+        }
+        else
+        {
+            <option value="0">-- All Accounts --</option>
+        }
+
+        @foreach (var item in accounts)
+        {
+            if (item.Value == selectedAccountId.ToString())
+            {
+                <option value="@item.Value" selected>@item.Text</option>
+            }
+            else
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        }
+    </select>
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No transactions found.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Account</th>
+                <th>Category</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.Date.ToShortDateString()</td>
+                    <td>@t.Description</td>
+                    <td>@t.Amount</td>
+                    <td>@t.Account?.Name</td>
+                    <td>@t.Category?.Name</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
